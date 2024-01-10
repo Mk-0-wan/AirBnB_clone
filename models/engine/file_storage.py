@@ -6,7 +6,11 @@ import json
 from pathlib import Path
 from models.base_model import BaseModel
 from models.user import User
-
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 class FileStorage():
     """A file storage class which has methods which will work well
@@ -59,11 +63,14 @@ class FileStorage():
         otherwise, do nothing. If the file doesn’t exist, no exception should be raised)
         """
         if Path(self.__file_path).is_file():
-            class_dict = {"BaseModel": BaseModel, "User": User}
+            class_dict = {"BaseModel": BaseModel, "User": User,
+                          "State": State, "City": City, "Amenity": Amenity,
+                          "Place": Place, "Review": Review
+                          }
             with open(self.__file_path, "r", encoding="utf-8") as f:
                 red = f.read()
-                dicts = json.loads(red)
-                if dicts != "":
+                if red != "":
+                    dicts = json.loads(red)
                     for k, v in dicts.items():
                         for key in class_dict.keys():
                             if key in k:
