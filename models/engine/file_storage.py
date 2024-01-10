@@ -5,6 +5,7 @@ This module contains a class called FileStorage
 import json
 from pathlib import Path
 from models.base_model import BaseModel
+from models.user import User 
 
 
 class FileStorage():
@@ -49,8 +50,11 @@ class FileStorage():
         A method that deserializes the JSON file to __objects if the file exist
         """
         if Path(self.__file_path).is_file():
+            class_dict = {"BaseModel": BaseModel, "User": User}
             with open(self.__file_path, "r", encoding="utf-8") as f:
                 red = f.read()
                 dicts = json.loads(red)
                 for k, v in dicts.items():
-                    self.__objects[k] = BaseModel(**v)
+                    for key in class_dict.keys():
+                        if key in k:
+                            self.__objects[k] = class_dict[key](**v)
