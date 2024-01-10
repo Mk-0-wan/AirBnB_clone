@@ -5,13 +5,16 @@ This module contains a class called FileStorage
 import json
 from pathlib import Path
 from models.base_model import BaseModel
-from models.user import User 
+from models.user import User
 
 
 class FileStorage():
-    """
-    A class that serializes instances to a JSON file and deserializes
-    JSON file to instances
+    """A file storage class which has methods which will work well
+    with the console
+
+    Args:
+        __file_path (file): json file to store each instance of an object
+        __objects (dictionary): a dict holding all the objects class name, and id
     """
     # to check full path vs relative path
     __file_path = "models/engine/file.json"
@@ -25,36 +28,43 @@ class FileStorage():
 
     def new(self, obj):
         """
-        A method that sets in __objects the obj with key <obj class name>.id
+        Collects the object from another class and then stores its
+        to the __object dictionary
+
+        Dict format { <class_name>.<object.id> : <object> }
+
+        Args:
+            obj (class Instance): a python object which is an instance of the
+            class BaseModel at the moment
         """
         self.__objects.update({f"{type(obj).__name__}.{obj.id}": obj})
-        # print("#############")
-        # for ob in self.__objects.values():
-            # print("------: ",ob, "----" )
-        # print("#############")
-        # print(self.__objects)
 
     def save(self):
         """
-        A method that serializes __objects to the JSON file (path: __file_path)
+        serializes __objects to the JSON
+        stores it to file (path: __file_path)
+        all the objects are now further extracted to their unique attributes
         """
         tmp_dict = {}
-        for k, v in self.__objects.items():
-            tmp_dict[k] = v.to_dict()
-        objects_json_str = json.dumps(tmp_dict)
+        for key, value in self.__objects.items():
+            tmp_dict[key] = value.to_dict()
+
         with open(self.__file_path, "w", encoding="utf-8") as f:
-            f.write(objects_json_str)
+            json.dump(tmp_dict, f)
+
 
     def reload(self):
         """
-        A method that deserializes the JSON file to __objects if the file exist
+        deserializes the JSON file to __objects (only if the JSON file (__file_path) exists;
+        otherwise, do nothing. If the file doesn’t exist, no exception should be raised)
         """
         if Path(self.__file_path).is_file():
             class_dict = {"BaseModel": BaseModel, "User": User}
             with open(self.__file_path, "r", encoding="utf-8") as f:
                 red = f.read()
                 dicts = json.loads(red)
-                for k, v in dicts.items():
-                    for key in class_dict.keys():
-                        if key in k:
-                            self.__objects[k] = class_dict[key](**v)
+                if dicts != "":
+                    for k, v in dicts.items():
+                        for key in class_dict.keys():
+                            if key in k:
+                                self.__objects[k] = class_dict[key](**v)
