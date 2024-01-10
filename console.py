@@ -12,7 +12,7 @@ class HBNBCommand(cmd.Cmd):
     A classe that creat a CLI
     """
     prompt = '(hbnb): '
-    
+
     def emptyline(self):
         """A method that garanties if an empty line + ENTER
          shouldn’t execute anything
@@ -23,7 +23,7 @@ class HBNBCommand(cmd.Cmd):
         """Quit command to exit the program
         """
         return True
-    
+
     do_quit = do_EOF
 
     def do_create(self, arg):
@@ -34,14 +34,14 @@ class HBNBCommand(cmd.Cmd):
         """
         if arg == "":
             print("** class name missing **")
-        elif arg == "BaseModel":
+        elif arg == "BaseModel":  # should be generalised
             obj = BaseModel()
             print(obj.id)
             models.storage.new(obj)
             models.storage.save()
         else:
             print("** class doesn't exist **")
-    
+
     def do_show(self, line):
         """A method that prints the string representation of an instance based
         on the class name and id
@@ -59,7 +59,7 @@ class HBNBCommand(cmd.Cmd):
         elif len(lst) == 0:
             print("** class name missing **")
         else:
-            if "BaseModel" in lst:
+            if "BaseModel" in lst:   # should be generalised
                 print("** instance id missing **")
             else:
                 print("** class doesn't exist **")
@@ -82,7 +82,7 @@ class HBNBCommand(cmd.Cmd):
         elif len(lst) == 0:
             print("** class name missing **")
         else:
-            if "BaseModel" in lst:
+            if "BaseModel" in lst:  # should be generalised
                 print("** instance id missing **")
             else:
                 print("** class doesn't exist **")
@@ -108,8 +108,33 @@ class HBNBCommand(cmd.Cmd):
                 lst_strings.append(str(dictionary_var[ke]))
         print(lst_strings)
 
+    def do_update(self, line):
+        lst = [arg for arg in line.split()]  # we need to impliment a better
+        # parsing process to handle the casses where there is "string with
+        # space inside a double qoute.
+
+        lenght = len(lst)
+        if lenght == 0:
+            print("** class name missing **")
+        elif lenght == 1:
+            if "BaseModel" in lst:  # should be generalised
+                print("** instance id missing **")
+            else:
+                print("** class doesn't exist **")
+        elif lenght >= 2:
+            cls_id = lst[0] + "." + lst[1]
+            dictionary_var = models.storage.all()
+            if cls_id in dictionary_var:  # the class.id exist
+                if lenght == 2:
+                    print("** attribute name missing **")
+                elif lenght == 3:
+                    print("** value missing **")
+                else:
+                    setattr(dictionary_var[cls_id], lst[2], lst[3])
+                    models.storage.save()
+            else:  # the class.id does not exist
+                print("** no instance found **")
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
-
-

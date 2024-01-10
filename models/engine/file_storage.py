@@ -12,8 +12,8 @@ class FileStorage():
     A class that serializes instances to a JSON file and deserializes
     JSON file to instances
     """
-
-    __file_path = "models/engine/file.json" #to check full path vs relative path
+    # to check full path vs relative path
+    __file_path = "models/engine/file.json"
     __objects = {}
 
     def all(self):
@@ -28,7 +28,7 @@ class FileStorage():
         """
         self.__objects.update({f"{type(obj).__name__}.{obj.id}": obj})
         # print("#############")
-#         for ob in self.__objects.values():
+        # for ob in self.__objects.values():
             # print("------: ",ob, "----" )
         # print("#############")
         # print(self.__objects)
@@ -37,7 +37,7 @@ class FileStorage():
         """
         A method that serializes __objects to the JSON file (path: __file_path)
         """
-        tmp_dict = {} 
+        tmp_dict = {}
         for k, v in self.__objects.items():
             tmp_dict[k] = v.to_dict()
         objects_json_str = json.dumps(tmp_dict)

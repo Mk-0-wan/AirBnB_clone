@@ -30,7 +30,7 @@ class BaseModel():
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now() # exist in task 3 and not in task 4
+            self.updated_at = datetime.now()  # exist in task 3 and not in N4
             models.storage.new(self)
 
     def save(self):
@@ -45,7 +45,7 @@ class BaseModel():
     def to_dict(self):
         """returns a dict representation of all the attributes in it"""
         new_dict = {
-                key : value.isoformat()
+                key: value.isoformat()
                 if key in ["created_at", "updated_at"] else value
                 for key, value in self.__dict__.items()
                 }
