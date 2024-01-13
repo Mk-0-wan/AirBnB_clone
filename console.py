@@ -269,8 +269,4 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == '__main__':
     my_cmd = HBNBCommand()
-    # print(class_dict["FileStorage"].__dict__.keys())
-    try:
-        my_cmd.cmdloop()
-    except KeyboardInterrupt:
-        pass
+    my_cmd.cmdloop()
