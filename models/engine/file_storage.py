@@ -12,13 +12,14 @@ from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
 
+
 class FileStorage():
     """A file storage class which has methods which will work well
     with the console
 
     Args:
         __file_path (file): json file to store each instance of an object
-        __objects (dictionary): a dict holding all the objects class name, and id
+        __objects (dictionary): a dict holding all the objs class name, and id
     """
     # to check full path vs relative path
     __file_path = "models/engine/file.json"
@@ -56,11 +57,11 @@ class FileStorage():
         with open(self.__file_path, "w", encoding="utf-8") as f:
             json.dump(tmp_dict, f)
 
-
     def reload(self):
         """
-        deserializes the JSON file to __objects (only if the JSON file (__file_path) exists;
-        otherwise, do nothing. If the file doesn’t exist, no exception should be raised)
+        deserializes the JSON file to __objects (only if the JSON file
+        (__file_path) exists; otherwise, do nothing. If the file doesn’t
+        exist, no exception should be raised)
         """
         if Path(self.__file_path).is_file():
             class_dict = {"BaseModel": BaseModel, "User": User,

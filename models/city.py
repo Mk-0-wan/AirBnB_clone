@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3
 """Simple state class"""
 from models.base_model import BaseModel

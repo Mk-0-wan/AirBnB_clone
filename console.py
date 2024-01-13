@@ -4,6 +4,9 @@ This module contains the entry point of the command interpreter
 """
 import cmd
 import models
+import shlex
+import re
+import json
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -17,7 +20,87 @@ class HBNBCommand(cmd.Cmd):
     """
     A classe that creat a CLI
     """
-    prompt = '(hbnb): '
+    prompt = '(hbnb) '
+
+    def default(self, line):
+        """Called on an input line when the command prefix is not recognized.
+        """
+        ok = 0
+        if "count" in line:
+            if "." in line:
+                lst = line.split(".")
+                if "(" in line and ")" in line and "count" in lst[1]:
+                    sp_line = line.split(".")[0]
+                    print(sum([sp_line in i for i in models.storage.all()]))
+        elif "{" not in line and ":" not in line:
+            if "(" in line and ")" in line:
+                try:
+                    part_1 = r'(\w+)\.(\w+)\((?:(?:\")?([\w -]*)(?:\")?'
+                    part_2 = r'(?:, \"([\w -]*)\"(?:(?:,)? '
+                    p3 = r'(?:(?:[\"\']*)?([\d\w.@ -]*)(?:[\"\']*)?).*)?)?)?\)'
+                    pt = re.compile(part_1 + part_2 + p3)
+                    rst = pt.match(line)
+                    arg_lst = []
+                    # populate the attribute list, replace None values
+                    # with a empty string.
+                    for i in rst.groups():
+                        if i is not None:
+                            arg_lst.append(i)
+                        else:
+                            arg_lst.append("")
+                    cls_nm, method_name, idd, attr_nm, attr_val = arg_lst
+                    # check if the idd is space string only and replace it
+                    # with default value to net be striped later.
+                    if len(idd) and not len(idd.strip()):
+                        idd = "default-id"
+                    if attr_val == "":
+                        r_txt = "{} {} {}"
+                        ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
+                    else:
+                        r_txt = "{} {} {} \"{}\""
+                        ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
+                    method_dict = {"all": self.do_all,
+                                   "destroy": self.do_destroy,
+                                   "show": self.do_show,
+                                   "update": self.do_update,
+                                   }
+                    ln_m = ln_m.strip()
+                    if method_name in method_dict:
+                        # added a space and . to let the do_all method
+                        # that the call is from the default method
+                        # so the printing should be different task #7 vs #11.
+                        if "all" == method_name:
+                            method_dict[method_name](ln_m + " .")
+                        else:
+                            method_dict[method_name](ln_m)
+                    ok = 1
+                except AttributeError:
+                    pass
+
+        else:
+            if "(" in line and ")" in line and "update" in line:
+                try:
+                    txt = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"(?:, (\{.+\})))?\)'
+                    pt = re.compile(txt)
+                    rst = pt.match(line)
+                    arg_lst = []
+                    for i in rst.groups():
+                        if i is not None:
+                            arg_lst.append(i)
+                        else:
+                            arg_lst.append("")
+                    if arg_lst[3]:
+                        dic = json.loads(arg_lst[3].replace("'", '"'))
+                        key_val = arg_lst[0] + "." + arg_lst[2]
+                        if key_val in models.storage.all():
+                            di = models.storage.all().get(key_val, "Is there")
+                            for i, j in dic.items():
+                                setattr(di, i, j)
+                    ok = 1
+                except AttributeError:
+                    pass
+        if not ok:
+            print("*** Unknown syntax:", line)
 
     def emptyline(self):
         """A method that garanties if an empty line + ENTER
@@ -86,6 +169,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ destroy BaseModel 1234-1234-1234.
         """
+        # print(line)
         lst = [arg for arg in line.split()]
         lenght = len(lst)
         if lenght == 2:
@@ -114,6 +198,10 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ all BaseModel or $ all.
         """
+        updated_call = 0
+        if "." in arg:
+            arg = arg.split()[0]
+            updated_call = 1
         class_exist = 0
         lst_strings = []
         dictionary_var = models.storage.all()
@@ -127,12 +215,19 @@ class HBNBCommand(cmd.Cmd):
         else:
             for ke in dictionary_var.keys():
                 lst_strings.append(str(dictionary_var[ke]))
-        print(lst_strings)
+        if lst_strings:
+            if updated_call:
+                print("[" + " ".join(lst_strings) + "]")
+            else:
+                print(lst_strings)
 
     def do_update(self, line):
-        lst = [arg for arg in line.split()]  # we need to impliment a better
-        # parsing process to handle the casses where there is "string with
-        # space inside a double qoute.
+        """A methode that updates an instance based on the class name and id
+        by adding or updating attribute (save the change into the JSON file).
+
+        Ex: $ update BaseModel 1234-1234-1234 email "aibnb@mail.com"
+        """
+        lst = shlex.split(line)
 
         lenght = len(lst)
         if lenght == 0:
@@ -155,11 +250,24 @@ class HBNBCommand(cmd.Cmd):
                 elif lenght == 3:
                     print("** value missing **")
                 else:
-                    setattr(dictionary_var[cls_id], lst[2], lst[3])
+                    int_fl = lst[3]
+                    try:
+                        int_fl = int(lst[3])
+                    except ValueError:
+                        try:
+                            int_fl = float(lst[3])
+                        except ValueError:
+                            int_fl = lst[3]
+                    setattr(dictionary_var[cls_id], lst[2], int_fl)
                     models.storage.save()
             else:  # the class.id does not exist
                 print("** no instance found **")
 
 
 if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+    my_cmd = HBNBCommand()
+    # print(class_dict["FileStorage"].__dict__.keys())
+    try:
+        my_cmd.cmdloop()
+    except KeyboardInterrupt:
+        pass
