@@ -20,7 +20,6 @@ class Place(BaseModel):
         Amenity.id later name (string): class attribute containing
         the state name.
     """
-    name = ""
     city_id = ""
     user_id = ""
     name = ""
