@@ -21,16 +21,31 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = '(hbnb) '
 
+    class_dict = {"BaseModel": BaseModel, "User": User,
+                  "State": State, "City": City, "Amenity": Amenity,
+                  "Place": Place, "Review": Review
+                  }
+
+    # method_set = {"all", "destroy", "show", "update"}a
+    # pt = re.compile(r'\w+(\.)(\w+)(\()(?:.*)(\))')
+    # rst = pt.match(st)
+    # for i in rst.groups():
+
+    # for meth in method_set:
+    # if meth + "("
+
     def default(self, line):
         """Called on an input line when the command prefix is not recognized.
         """
         ok = 0
+
         if "count" in line:
             if "." in line:
                 lst = line.split(".")
                 if "(" in line and ")" in line and "count" in lst[1]:
                     sp_line = line.split(".")[0]
                     print(sum([sp_line in i for i in models.storage.all()]))
+                    ok = 1
         elif "{" not in line and ":" not in line:
             if "(" in line and ")" in line:
                 try:
@@ -79,24 +94,38 @@ class HBNBCommand(cmd.Cmd):
         else:
             if "(" in line and ")" in line and "update" in line:
                 try:
-                    txt = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"(?:, (\{.+\})))?\)'
-                    pt = re.compile(txt)
+                    txt_1 = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"'
+                    txt_2 = r'(?:, (\{(?:.*)?\})?))?\)'
+                    pt = re.compile(txt_1 + txt_2)
                     rst = pt.match(line)
                     arg_lst = []
+                    ok = 1
                     for i in rst.groups():
                         if i is not None:
                             arg_lst.append(i)
                         else:
                             arg_lst.append("")
-                    if arg_lst[3]:
-                        dic = json.loads(arg_lst[3].replace("'", '"'))
-                        key_val = arg_lst[0] + "." + arg_lst[2]
-                        if key_val in models.storage.all():
-                            di = models.storage.all().get(key_val, "Is there")
-                            for i, j in dic.items():
-                                setattr(di, i, j)
-                    models.storage.save()
-                    ok = 1
+                    cls_nm, method_name, idd, d_str = arg_lst
+                    if d_str:
+                        dic = json.loads(d_str.replace("'", '"'))
+                        if cls_nm in self.class_dict:
+                            if len(dic) == 0:
+                                print("** attribute name missing **")
+                            else:
+                                key_val = cls_nm + "." + idd
+                                # heck if the class.id does exist
+                                if key_val in models.storage.all():
+                                    obj = models.storage.all().get(key_val)
+                                    for i, j in dic.items():
+                                        if len(j) == 0:
+                                            print("** value missing **")
+                                        else:
+                                            setattr(obj, i, j)
+                                            models.storage.save()
+                                else:  # the class.id does not exist
+                                    print("** no instance found **")
+                        else:
+                            print("** class doesn't exist **")
                 except AttributeError:
                     print("", end="")
         if not ok:
@@ -124,12 +153,8 @@ class HBNBCommand(cmd.Cmd):
         if arg == "":
             print("** class name missing **")
         else:
-            class_dict = {"BaseModel": BaseModel, "User": User,
-                          "State": State, "City": City, "Amenity": Amenity,
-                          "Place": Place, "Review": Review
-                          }
-            if arg in class_dict:
-                obj = class_dict.get(arg, "")()
+            if arg in self.class_dict:
+                obj = self.class_dict.get(arg, "")()
                 print(obj.id)
                 models.storage.new(obj)
                 models.storage.save()
@@ -155,11 +180,7 @@ class HBNBCommand(cmd.Cmd):
         elif lenght == 0:
             print("** class name missing **")
         elif lenght == 1:
-            class_dict = {"BaseModel": BaseModel, "User": User,
-                          "State": State, "City": City, "Amenity": Amenity,
-                          "Place": Place, "Review": Review
-                          }
-            if lst[0] in class_dict:
+            if lst[0] in self.class_dict:
                 print("** instance id missing **")
             else:
                 print("** class doesn't exist **")
@@ -184,11 +205,7 @@ class HBNBCommand(cmd.Cmd):
         elif lenght == 0:
             print("** class name missing **")
         elif lenght == 1:
-            class_dict = {"BaseModel": BaseModel, "User": User,
-                          "State": State, "City": City, "Amenity": Amenity,
-                          "Place": Place, "Review": Review
-                          }
-            if lst[0] in class_dict:
+            if lst[0] in self.class_dict:
                 print("** instance id missing **")
             else:
                 print("** class doesn't exist **")
@@ -236,11 +253,7 @@ class HBNBCommand(cmd.Cmd):
         if lenght == 0:
             print("** class name missing **")
         elif lenght == 1:
-            class_dict = {"BaseModel": BaseModel, "User": User,
-                          "State": State, "City": City, "Amenity": Amenity,
-                          "Place": Place, "Review": Review
-                          }
-            if lst[0] in class_dict:
+            if lst[0] in self.class_dict:
                 print("** instance id missing **")
             else:
                 print("** class doesn't exist **")
