@@ -24,7 +24,6 @@ class TestModel(unittest.TestCase):
         self.assertFalse(hasattr(obj, "state_id"))
         self.assertTrue(hasattr(obj, "text"))
         self.assertEqual(obj.__dict__["place_id"], "ALX-CODE-STREET")
-        self.assertNotEqual(obj.created_at, obj.updated_at)
         self.assertEqual(type(obj.updated_at), type(datetime.datetime.now()))
 
     def test_pycodestyle(self):

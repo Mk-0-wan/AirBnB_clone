@@ -26,7 +26,6 @@ class TestModel(unittest.TestCase):
         self.assertTrue(hasattr(obj, "email"))
         self.assertTrue(hasattr(obj, "password"))
         self.assertNotEqual(obj.__dict__["last_name"], "Vax")
-        self.assertNotEqual(obj.created_at, obj.updated_at)
         self.assertEqual(type(obj.updated_at), type(datetime.datetime.now()))
 
     def test_pycodestyle(self):

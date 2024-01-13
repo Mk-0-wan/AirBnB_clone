@@ -22,85 +22,86 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = '(hbnb) '
 
-    def default(self, line):
-        """Called on an input line when the command prefix is not recognized.
-        """
-        ok = 0
-        if "count" in line:
-            if "." in line:
-                lst = line.split(".")
-                if "(" in line and ")" in line and "count" in lst[1]:
-                    sp_line = line.split(".")[0]
-                    print(sum([sp_line in i for i in models.storage.all()]))
-        elif "{" not in line and ":" not in line:
-            if "(" in line and ")" in line:
-                try:
-                    part_1 = r'(\w+)\.(\w+)\((?:(?:\")?([\w -]*)(?:\")?'
-                    part_2 = r'(?:, \"([\w -]*)\"(?:(?:,)? '
-                    p3 = r'(?:(?:[\"\']*)?([\d\w.@ -]*)(?:[\"\']*)?).*)?)?)?\)'
-                    pt = re.compile(part_1 + part_2 + p3)
-                    rst = pt.match(line)
-                    arg_lst = []
-                    # populate the attribute list, replace None values
-                    # with a empty string.
-                    for i in rst.groups():
-                        if i is not None:
-                            arg_lst.append(i)
-                        else:
-                            arg_lst.append("")
-                    cls_nm, method_name, idd, attr_nm, attr_val = arg_lst
-                    # check if the idd is space string only and replace it
-                    # with default value to net be striped later.
-                    if len(idd) and not len(idd.strip()):
-                        idd = "default-id"
-                    if attr_val == "":
-                        r_txt = "{} {} {}"
-                        ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
-                    else:
-                        r_txt = "{} {} {} \"{}\""
-                        ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
-                    method_dict = {"all": self.do_all,
-                                   "destroy": self.do_destroy,
-                                   "show": self.do_show,
-                                   "update": self.do_update,
-                                   }
-                    ln_m = ln_m.strip()
-                    if method_name in method_dict:
-                        # added a space and . to let the do_all method
-                        # that the call is from the default method
-                        # so the printing should be different task #7 vs #11.
-                        if "all" == method_name:
-                            method_dict[method_name](ln_m + " .")
-                        else:
-                            method_dict[method_name](ln_m)
-                    ok = 1
-                except AttributeError:
-                    pass
+    # def default(self, line):
+        # """Called on an input line when the command prefix is not recognized.
+        # """
+        # ok = 0
+        # if "count" in line:
+            # if "." in line:
+                # lst = line.split(".")
+                # if "(" in line and ")" in line and "count" in lst[1]:
+                    # sp_line = line.split(".")[0]
+                    # print(sum([sp_line in i for i in models.storage.all()]))
+        # elif "{" not in line and ":" not in line:
+            # if "(" in line and ")" in line:
+                # try:
+                    # part_1 = r'(\w+)\.(\w+)\((?:(?:\")?([\w -]*)(?:\")?'
+                    # part_2 = r'(?:, \"([\w -]*)\"(?:(?:,)? '
+                    # p3 = r'(?:(?:[\"\']*)?([\d\w.@ -]*)(?:[\"\']*)?).*)?)?)?\)'
+                    # pt = re.compile(part_1 + part_2 + p3)
+                    # rst = pt.match(line)
+                    # arg_lst = []
+                    # # populate the attribute list, replace None values
+                    # # with a empty string.
+                    # for i in rst.groups():
+                        # if i is not None:
+                            # arg_lst.append(i)
+                        # else:
+                            # arg_lst.append("")
+                    # cls_nm, method_name, idd, attr_nm, attr_val = arg_lst
+                    # # check if the idd is space string only and replace it
+                    # # with default value to net be striped later.
+                    # if len(idd) and not len(idd.strip()):
+                        # idd = "default-id"
+                    # if attr_val == "":
+                        # r_txt = "{} {} {}"
+                        # ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
+                    # else:
+                        # r_txt = "{} {} {} \"{}\""
+                        # ln_m = r_txt.format(cls_nm, idd, attr_nm, attr_val)
+                    # method_dict = {"all": self.do_all,
+                                   # "destroy": self.do_destroy,
+                                   # "show": self.do_show,
+                                   # "update": self.do_update,
+                                   # }
+                    # ln_m = ln_m.strip()
+                    # if method_name in method_dict:
+                        # # added a space and . to let the do_all method
+                        # # that the call is from the default method
+                        # # so the printing should be different task #7 vs #11.
+                        # if "all" == method_name:
+                            # method_dict[method_name](ln_m + " .")
+                        # else:
+                            # method_dict[method_name](ln_m)
+                    # ok = 1
+                # except AttributeError:
+                    # print("", end="")
 
-        else:
-            if "(" in line and ")" in line and "update" in line:
-                try:
-                    txt = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"(?:, (\{.+\})))?\)'
-                    pt = re.compile(txt)
-                    rst = pt.match(line)
-                    arg_lst = []
-                    for i in rst.groups():
-                        if i is not None:
-                            arg_lst.append(i)
-                        else:
-                            arg_lst.append("")
-                    if arg_lst[3]:
-                        dic = json.loads(arg_lst[3].replace("'", '"'))
-                        key_val = arg_lst[0] + "." + arg_lst[2]
-                        if key_val in models.storage.all():
-                            di = models.storage.all().get(key_val, "Is there")
-                            for i, j in dic.items():
-                                setattr(di, i, j)
-                    ok = 1
-                except AttributeError:
-                    pass
-        if not ok:
-            print("*** Unknown syntax:", line)
+        # else:
+            # if "(" in line and ")" in line and "update" in line:
+                # try:
+                    # txt = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"(?:, (\{.+\})))?\)'
+                    # pt = re.compile(txt)
+                    # rst = pt.match(line)
+                    # arg_lst = []
+                    # for i in rst.groups():
+                        # if i is not None:
+                            # arg_lst.append(i)
+                        # else:
+                            # arg_lst.append("")
+                    # if arg_lst[3]:
+                        # dic = json.loads(arg_lst[3].replace("'", '"'))
+                        # key_val = arg_lst[0] + "." + arg_lst[2]
+                        # if key_val in models.storage.all():
+                            # di = models.storage.all().get(key_val, "Is there")
+                            # for i, j in dic.items():
+                                # setattr(di, i, j)
+                    # models.storage.save()
+                    # ok = 1
+                # except AttributeError:
+                    # print("", end="")
+        # if not ok:
+            # print("*** Unknown syntax:", line)
 
     def emptyline(self):
         """A method that garanties if an empty line + ENTER

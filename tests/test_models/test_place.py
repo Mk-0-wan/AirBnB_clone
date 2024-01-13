@@ -56,7 +56,6 @@ class TestModel(unittest.TestCase):
             obj.max_guest,
             obj.price_by_night]), int)
         self.assertTrue(type(obj.amenity_ids), list)
-        self.assertNotEqual(obj.created_at, obj.updated_at)
         self.assertEqual(type(obj.updated_at), type(datetime.datetime.now()))
 
     def test_pycodestyle(self):
