@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-This module contains the entry point of the command interpreter
-"""
+"""This module contains the entry point of the command interpreter"""
 import cmd
 import models
 import shlex
@@ -20,6 +18,7 @@ class HBNBCommand(cmd.Cmd):
     """
     A classe that creat a CLI
     """
+
     prompt = '(hbnb) '
 
     # def default(self, line):
@@ -110,8 +109,7 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_EOF(self, line):
-        """Quit command to exit the program
-        """
+        """Quit command to exit the program"""
         return True
 
     do_quit = do_EOF
@@ -122,6 +120,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ create BaseModel
         """
+
         if arg == "":
             print("** class name missing **")
         else:
@@ -143,6 +142,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ show BaseModel 1234-1234-1234.
         """
+
         lst = [arg for arg in line.split()]
         lenght = len(lst)
         if lenght == 2:
@@ -170,7 +170,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ destroy BaseModel 1234-1234-1234.
         """
-        # print(line)
+
         lst = [arg for arg in line.split()]
         lenght = len(lst)
         if lenght == 2:
@@ -199,6 +199,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ all BaseModel or $ all.
         """
+
         updated_call = 0
         if "." in arg:
             arg = arg.split()[0]
@@ -228,6 +229,7 @@ class HBNBCommand(cmd.Cmd):
 
         Ex: $ update BaseModel 1234-1234-1234 email "aibnb@mail.com"
         """
+
         lst = shlex.split(line)
 
         lenght = len(lst)
