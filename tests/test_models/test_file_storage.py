@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 """All the test_cases for the city model class"""
 import os
 import json

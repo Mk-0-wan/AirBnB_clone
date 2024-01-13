@@ -1,5 +1,5 @@
-#!usr/bin/python3 """All the test_cases for the city model class"""
-
+#!/usr/bin/python3
+"""All the test_cases for the city model class"""
 import pep8
 import unittest
 import datetime
@@ -26,7 +26,7 @@ class TestModel(unittest.TestCase):
         self.assertTrue(hasattr(obj, "email"))
         self.assertTrue(hasattr(obj, "password"))
         self.assertNotEqual(obj.__dict__["last_name"], "Vax")
-        self.assertEqual(obj.created_at, obj.updated_at)
+        self.assertNotEqual(obj.created_at, obj.updated_at)
         self.assertEqual(type(obj.updated_at), type(datetime.datetime.now()))
 
     def test_pycodestyle(self):

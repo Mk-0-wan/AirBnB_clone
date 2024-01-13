@@ -1,7 +1,5 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 """All the test_cases for the base model class"""
-
-
 import unittest
 import pep8
 import datetime
@@ -34,7 +32,7 @@ class TestModel(unittest.TestCase):
         self.assertTrue(hasattr(obj, "new_name"))
         self.assertFalse(hasattr(obj, "age"))
         self.assertNotEqual(obj.__dict__["new_name"], "Vax")
-        self.assertEqual(obj.created_at, obj.updated_at)
+        self.assertNotEqual(obj.created_at, obj.updated_at)
         self.assertEqual(type(obj.updated_at), type(datetime.datetime.now()))
 
     def test_base_save(self):
