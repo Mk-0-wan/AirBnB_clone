@@ -284,6 +284,4 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == '__main__':
     my_cmd = HBNBCommand()
-    with patch('sys.stdout', new=StringIO()) as f:
-        HBNBCommand().onecmd("help show")
     my_cmd.cmdloop()
