@@ -48,3 +48,7 @@ class TestModel(unittest.TestCase):
         self.assertTrue(obj.__str__(), cp.__str__())
         cp.name = "drihman"
         self.assertNotEqual(obj.__str__(), cp.__str__())
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -72,3 +72,7 @@ class TestModel(unittest.TestCase):
                 test_dic = dicts[f"{type(obj).__name__}.{obj.id}"]
                 self.assertIn('name', test_dic)
                 self.assertEqual("Birmingham", test_dic['name'])
+
+
+if __name__ == '__main__':
+    unittest.main()

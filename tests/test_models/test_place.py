@@ -80,3 +80,7 @@ class TestModel(unittest.TestCase):
 
         cp.name = "drihman"
         self.assertNotEqual(obj.__str__(), cp.__str__())
+
+
+if __name__ == '__main__':
+    unittest.main()

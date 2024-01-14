@@ -104,3 +104,7 @@ class TestModel(unittest.TestCase):
                 ['./models/base_model.py',
                  './tests/test_models/test_base_model.py'])
         self.assertEqual(record.total_errors, 0, "errors found")
+
+
+if __name__ == '__main__':
+    unittest.main()
