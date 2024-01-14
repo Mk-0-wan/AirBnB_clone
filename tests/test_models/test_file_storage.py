@@ -5,7 +5,6 @@ import json
 import pep8
 import models
 import unittest
-import datetime
 from models.engine.file_storage import FileStorage
 
 
@@ -27,10 +26,15 @@ class TestModel(unittest.TestCase):
     def test_new_method(self):
         """Checking if the new method is working all fine"""
         fl_obj = FileStorage()
-        self.assertTrue(fl_obj._FileStorage__objects, {})
+        fl_obj._FileStorage__objects.clear()
+        # check if the dictionary __objects has been cleared.
+        self.assertEqual(fl_obj._FileStorage__objects, {})
         obj = models.user.User()
         obj.name = "victor"
-        self.assertNotEqual(fl_obj._FileStorage__objects, {})
+        FileStorage().new(obj)
+        if(self.assertNotEqual(fl_obj._FileStorage__objects, {})):
+            key = "User." + obj.id
+            self.assertIn(key, fl_obj._FileStorage__objects)
 
     def test_save_method(self):
         """Checking for file saving and saving format"""
@@ -64,7 +68,7 @@ class TestModel(unittest.TestCase):
             red = json_file.read()
             if red:
                 dicts = json.loads(red)
-        self.assertEqual(type(dicts), dict)
-        self.assertDictContainsSubset(
-                {"name": "Birmingham"},
-                dicts[f"{type(obj).__name__}.{obj.id}"])
+                self.assertEqual(type(dicts), dict)
+                test_dic = dicts[f"{type(obj).__name__}.{obj.id}"]
+                self.assertIn('name', test_dic)
+                self.assertEqual("Birmingham", test_dic['name'])

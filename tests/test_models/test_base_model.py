@@ -4,7 +4,6 @@ import unittest
 import pep8
 import datetime
 from models.base_model import BaseModel as bm
-from models.engine.file_storage import FileStorage as fs
 
 
 class TestModel(unittest.TestCase):
