@@ -96,12 +96,12 @@ class HBNBCommand(cmd.Cmd):
         else:
             if "(" in line and ")" in line and "update" in line:
                 try:
+                    ok = 1
                     txt_1 = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"'
                     txt_2 = r'(?:, (\{(?:.*)?\})?))?\)'
                     pt = re.compile(txt_1 + txt_2)
                     rst = pt.match(line)
                     arg_lst = []
-                    ok = 1
                     for i in rst.groups():
                         if i is not None:
                             arg_lst.append(i)
@@ -109,27 +109,44 @@ class HBNBCommand(cmd.Cmd):
                             arg_lst.append("")
                     cls_nm, method_name, idd, d_str = arg_lst
                     if d_str:
-                        dic = json.loads(d_str.replace("'", '"'))
-                        if cls_nm in self.class_dict:
-                            if len(dic) == 0:
-                                print("** attribute name missing **")
+                        try:
+                            if cls_nm in self.class_dict:
+                                if not len(idd.strip()):
+                                    print("** instance id missing **")
+                                    raise AttributeError("no id")
+                                else:
+                                    k_v = cls_nm + "." + idd
+                                    # heck if the class.id does exist
+                                    if k_v in models.storage.all():
+                                        obj = models.storage.all().get(k_v)
+                                        d_str = d_str.replace("'", '"')
+                                        dic = json.loads(d_str)
+                                        if len(dic) == 0:
+                                            a = "** attribute name missing **"
+                                            print(a)
+                                            raise AttributeError("no att name")
+                                        # i m looping in the dict given as line
+                                        for i, j in dic.items():
+                                            if len(i) == 0:
+                                                a = "** attribute "
+                                                b = "name missing **"
+                                                print(a + b)
+                                                raise AttributeError("no name")
+                                            if len(j) == 0:
+                                                a = "** value missing **"
+                                                print(a)
+                                                raise AttributeError("no val")
+                                            else:
+                                                setattr(obj, i, j)
+                                                models.storage.save()
+                                    else:  # the class.id does not exist
+                                        print("** no instance found **")
                             else:
-                                key_val = cls_nm + "." + idd
-                                # heck if the class.id does exist
-                                if key_val in models.storage.all():
-                                    obj = models.storage.all().get(key_val)
-                                    for i, j in dic.items():
-                                        if len(j) == 0:
-                                            print("** value missing **")
-                                        else:
-                                            setattr(obj, i, j)
-                                            models.storage.save()
-                                else:  # the class.id does not exist
-                                    print("** no instance found **")
-                        else:
-                            print("** class doesn't exist **")
+                                print("** class doesn't exist **")
+                        except json.decoder.JSONDecodeError as f:
+                            ok = 0
                 except AttributeError:
-                    print("", end="")
+                    ok = 0
         if not ok:
             print("*** Unknown syntax:", line)
 
