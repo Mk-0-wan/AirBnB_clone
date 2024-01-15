@@ -1,13 +1,17 @@
 #!/usr/bin/python3
 """All the test_cases for the base model class"""
-import unittest
 import pep8
+import unittest
 import datetime
 from models.base_model import BaseModel as bm
+from models.engine.file_storage import FileStorage as fs
 
 
 class TestModel(unittest.TestCase):
     """Test cases for all the base_model class and its methods"""
+    def setUp(self):
+        """Setup Classes which will allow me to avoid repetition of classes"""
+        self.bl = [bm(), bm()]
 
     def test_documentation(self):
         """Checking doctstring for all the class methods exists"""
@@ -26,7 +30,7 @@ class TestModel(unittest.TestCase):
 
     def test_base_model_attribute(self):
         """Testing for all the attributes instances"""
-        obj = bm()
+        obj = self.bl[0]
         obj.new_name = "Max"
         self.assertTrue(hasattr(obj, "new_name"))
         self.assertFalse(hasattr(obj, "age"))
@@ -35,7 +39,7 @@ class TestModel(unittest.TestCase):
 
     def test_base_save(self):
         """Testing the base model save method"""
-        obj = bm()
+        obj = self.bl[0]
         obj.name = "Pax"
         old_id = obj.id
         before = obj.updated_at
@@ -48,7 +52,7 @@ class TestModel(unittest.TestCase):
 
     def test_base_to_dict(self):
         """Checking the base model to_dict method"""
-        obj = bm()
+        obj = self.bl[0]
         dct = obj.to_dict()
         self.assertTrue(type(dct), dict)
         self.assertTrue(type(dct["created_at"]), str)
@@ -59,20 +63,14 @@ class TestModel(unittest.TestCase):
 
     def test_base_model_kwargs(self):
         """Test for kwargs arguments when they are passed"""
-        obj = bm()
+        obj = self.bl[0]
         old_id = obj.id
         attr = obj.to_dict()
-        new_obj = bm(attr)
+        new_obj = bm(**attr)
 
         self.assertNotEqual(obj, new_obj)
         self.assertTrue(new_obj.id, old_id)
-        self.assertNotEqual(obj.created_at, new_obj.created_at)
-
-        k = {}
-        self.assertTrue(hasattr(bm(**k), "updated_at"))
-        self.assertTrue(hasattr(bm(**k), "updated_at"))
-        self.assertTrue(hasattr(bm(**k), "id"))
-        self.assertFalse(hasattr(bm({**k}), "Apex"))
+        self.assertEqual(obj.created_at, new_obj.created_at)
 
         new_obj.stat = "Good"
         new = new_obj.to_dict()
@@ -84,7 +82,7 @@ class TestModel(unittest.TestCase):
 
     def test_string_format_method(self):
         """Checking for the string format matches the expected criteria"""
-        obj = bm()
+        obj = self.bl[0]
         self.assertEqual(obj.__str__(),
                          f"[{type(obj).__name__}] ({obj.id}) {obj.__dict__}")
 
@@ -104,6 +102,26 @@ class TestModel(unittest.TestCase):
                 ['./models/base_model.py',
                  './tests/test_models/test_base_model.py'])
         self.assertEqual(record.total_errors, 0, "errors found")
+
+    def test_updated_at_and_created_at(self):
+        """Checking for all the validity test of the attributes"""
+        self.assertNotEqual(self.bl[0].updated_at, self.bl[1].updated_at)
+        self.assertNotEqual(self.bl[0].created_at, self.bl[1].created_at)
+        old = self.bl[0]
+        new = self.bl[0].save()
+        self.assertNotEqual(old, new)
+
+    def test_id_of_different_instances(self):
+        """Testing the ids of two different instances"""
+        self.assertTrue(self.bl[0].id, str)
+        self.assertTrue(self.bl[1].id, str)
+        self.assertNotEqual(self.bl[0].id, self.bl[1].id)
+
+    def tearDown(self):
+        """Cleaning up all that not necessary needed"""
+        for _x in self.bl:
+            del fs().all()[f"{_x.__class__.__name__}.{_x.id}"]
+        fs().save()
 
 
 if __name__ == '__main__':
