@@ -5,8 +5,6 @@ import models
 import shlex
 import re
 import json
-from unittest.mock import patch
-from io import StringIO
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -22,25 +20,16 @@ class HBNBCommand(cmd.Cmd):
     """
 
     prompt = '(hbnb) '
-
     class_dict = {"BaseModel": BaseModel, "User": User,
                   "State": State, "City": City, "Amenity": Amenity,
                   "Place": Place, "Review": Review
                   }
 
-    # method_set = {"all", "destroy", "show", "update"}a
-    # pt = re.compile(r'\w+(\.)(\w+)(\()(?:.*)(\))')
-    # rst = pt.match(st)
-    # for i in rst.groups():
-
-    # for meth in method_set:
-    # if meth + "("
-
     def default(self, line):
         """Called on an input line when the command prefix is not recognized.
         """
-        ok = 0
 
+        ok = 0
         if "count" in line:
             if "." in line:
                 lst = line.split(".")
@@ -92,61 +81,69 @@ class HBNBCommand(cmd.Cmd):
                     ok = 1
                 except AttributeError:
                     print("", end="")
-
         else:
             if "(" in line and ")" in line and "update" in line:
                 try:
-                    ok = 1
-                    txt_1 = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"'
-                    txt_2 = r'(?:, (\{(?:.*)?\})?))?\)'
-                    pt = re.compile(txt_1 + txt_2)
-                    rst = pt.match(line)
-                    arg_lst = []
-                    for i in rst.groups():
-                        if i is not None:
-                            arg_lst.append(i)
-                        else:
-                            arg_lst.append("")
-                    cls_nm, method_name, idd, d_str = arg_lst
-                    if d_str:
-                        try:
-                            if cls_nm in self.class_dict:
-                                if not len(idd.strip()):
-                                    print("** instance id missing **")
-                                    raise AttributeError("no id")
-                                else:
+                    try:
+                        ok = 1
+                        txt_1 = r'(\w+)\.(\w+)\((?:\"([\w-]+)\"'
+                        txt_2 = r'(?:, (\{(?:.*)?\})?))?\)'
+                        pt = re.compile(txt_1 + txt_2)
+                        rst = pt.match(line)
+                        arg_lst = []
+                        for i in rst.groups():
+                            if i is not None:
+                                arg_lst.append(i)
+                            else:
+                                arg_lst.append("")
+                        cls_nm, method_name, idd, d_str = arg_lst
+                        if d_str:
+                            try:
+                                if cls_nm in self.class_dict:
+                                    if not len(idd.strip()):
+                                        print("** instance id missing **")
+                                        raise ValueError("no id")
                                     k_v = cls_nm + "." + idd
                                     # heck if the class.id does exist
                                     if k_v in models.storage.all():
                                         obj = models.storage.all().get(k_v)
+                                        # the type quotes we use is not that
+                                        # important as much as they are all
+                                        # the same, all signle quoates
+                                        # or all a double qoutes.
                                         d_str = d_str.replace("'", '"')
+
                                         dic = json.loads(d_str)
                                         if len(dic) == 0:
                                             a = "** attribute name missing **"
                                             print(a)
-                                            raise AttributeError("no att name")
-                                        # i m looping in the dict given as line
+                                            raise ValueError("no att name")
+                                        # I m looping in the dict given as line
                                         for i, j in dic.items():
                                             if len(i) == 0:
                                                 a = "** attribute "
                                                 b = "name missing **"
                                                 print(a + b)
-                                                raise AttributeError("no name")
+                                                raise ValueError("no name")
                                             if len(j) == 0:
                                                 a = "** value missing **"
                                                 print(a)
-                                                raise AttributeError("no val")
+                                                raise ValueError("no val")
                                             else:
                                                 setattr(obj, i, j)
                                                 models.storage.save()
                                     else:  # the class.id does not exist
                                         print("** no instance found **")
-                            else:
-                                print("** class doesn't exist **")
-                        except json.decoder.JSONDecodeError as f:
-                            ok = 0
-                except AttributeError:
-                    ok = 0
+                                        raise ValueError("no instance")
+                                else:
+                                    print("** class doesn't exist **")
+                                    raise ValueError("no class")
+                            except json.decoder.JSONDecodeError:
+                                ok = 0
+                    except AttributeError:
+                        ok = 0
+                except ValueError:
+                    ok = 1
         if not ok:
             print("*** Unknown syntax:", line)
 
@@ -267,7 +264,6 @@ class HBNBCommand(cmd.Cmd):
         """
 
         lst = shlex.split(line)
-
         lenght = len(lst)
         if lenght == 0:
             print("** class name missing **")
@@ -300,5 +296,4 @@ class HBNBCommand(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    my_cmd = HBNBCommand()
-    my_cmd.cmdloop()
+    HBNBCommand().cmdloop()
