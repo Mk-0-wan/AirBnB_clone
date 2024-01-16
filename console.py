@@ -125,7 +125,7 @@ class HBNBCommand(cmd.Cmd):
                                                 b = "name missing **"
                                                 print(a + b)
                                                 raise ValueError("no name")
-                                            if len(j) == 0:
+                                            if len(str(j)) == 0:
                                                 a = "** value missing **"
                                                 print(a)
                                                 raise ValueError("no val")
@@ -187,12 +187,15 @@ class HBNBCommand(cmd.Cmd):
         lst = [arg for arg in line.split()]
         lenght = len(lst)
         if lenght == 2:
-            key = lst[0] + "." + lst[1]
-            dictionary_var = models.storage.all()
-            if key in dictionary_var:
-                print(dictionary_var[key])
+            if lst[0] in self.class_dict:
+                key = lst[0] + "." + lst[1]
+                dictionary_var = models.storage.all()
+                if key in dictionary_var:
+                    print(dictionary_var[key])
+                else:
+                    print("** no instance found **")
             else:
-                print("** no instance found **")
+                print("** class doesn't exist **")
         elif lenght == 0:
             print("** class name missing **")
         elif lenght == 1:
@@ -211,13 +214,16 @@ class HBNBCommand(cmd.Cmd):
         lst = [arg for arg in line.split()]
         lenght = len(lst)
         if lenght == 2:
-            key = lst[0] + "." + lst[1]
-            dictionary_var = models.storage.all()
-            if key in dictionary_var:
-                del dictionary_var[key]
-                models.storage.save()
+            if lst[0] in self.class_dict:
+                key = lst[0] + "." + lst[1]
+                dictionary_var = models.storage.all()
+                if key in dictionary_var:
+                    del dictionary_var[key]
+                    models.storage.save()
+                else:
+                    print("** no instance found **")
             else:
-                print("** no instance found **")
+                print("** class doesn't exist **")
         elif lenght == 0:
             print("** class name missing **")
         elif lenght == 1:
@@ -273,26 +279,29 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print("** class doesn't exist **")
         elif lenght >= 2:
-            cls_id = lst[0] + "." + lst[1]
-            dictionary_var = models.storage.all()
-            if cls_id in dictionary_var:  # the class.id exist
-                if lenght == 2:
-                    print("** attribute name missing **")
-                elif lenght == 3:
-                    print("** value missing **")
-                else:
-                    int_fl = lst[3]
-                    try:
-                        int_fl = int(lst[3])
-                    except ValueError:
+            if lst[0] in self.class_dict:
+                cls_id = lst[0] + "." + lst[1]
+                dictionary_var = models.storage.all()
+                if cls_id in dictionary_var:  # the class.id exist
+                    if lenght == 2:
+                        print("** attribute name missing **")
+                    elif lenght == 3:
+                        print("** value missing **")
+                    else:
+                        int_fl = lst[3]
                         try:
-                            int_fl = float(lst[3])
+                            int_fl = int(lst[3])
                         except ValueError:
-                            int_fl = lst[3]
-                    setattr(dictionary_var[cls_id], lst[2], int_fl)
-                    models.storage.save()
-            else:  # the class.id does not exist
-                print("** no instance found **")
+                            try:
+                                int_fl = float(lst[3])
+                            except ValueError:
+                                int_fl = lst[3]
+                        setattr(dictionary_var[cls_id], lst[2], int_fl)
+                        models.storage.save()
+                else:  # the class.id does not exist
+                    print("** no instance found **")
+            else:
+                print("** class doesn't exist **")
 
 
 if __name__ == '__main__':
