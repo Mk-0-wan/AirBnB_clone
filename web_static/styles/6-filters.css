@@ -1,7 +1,6 @@
 .container {
     max-width: 1000px;
     margin-top: 30px;
-    margin-bottom: 30px;
     margin: auto;
     width: 50%;
 
@@ -14,6 +13,7 @@
     border: solid 1px #DDDDDD;
     border-radius: 4px;
     display: flex;
+    margin-bottom: 30px;
     align-items: center;
 }
 
@@ -43,7 +43,7 @@ h4 {
 
 .popover {
     color: #FAFAFA;
-    opacity: 0;
+    display: none;
     border: solid #DDDDDD 1px;
     border-radius: 4px;
     position: absolute;
@@ -64,7 +64,7 @@ h4 {
 
 .locations:hover > .popover,
 .amenities:hover > .popover {
-    opacity: 1;
+    display: block;
 }
 
 
