@@ -1,0 +1,11 @@
+header {
+    color: white;
+    height: 70px;
+    width: 100%;
+    border: solid 1px #CCCCCC;
+    background-image: url("../images/logo.png");
+    background-repeat: no-repeat;
+    background-position-x: 20px;
+    align-items: center;
+    margin-bottom: 30px;
+}
