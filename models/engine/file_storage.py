@@ -8,13 +8,42 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if (not cls):
+            return FileStorage.__objects
+        else:
+            res = {}
+            for key_object, value_object in FileStorage.__objects.items():
+                if (type(value_object) == cls):
+                    # adding the key value pair in the new dict
+                    res[key_object] = value_object
+            return res
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+
+    def delete(self, obj=None):
+        """To delete an object inside the list of objects
+        Arg:
+            obj (classObject): an instance of a class e.g State object, Place
+            object, Amenity Object and so on.
+        Return:
+            FileStorage.__object (dict) : a dictionary of key value pairs
+            where the key is the {[ClassName](UUID) : {Actual Class Obejct}}
+        """
+        if (not obj):
+            return  None
+        else:
+            # reverse order of the dict where the key is the value
+            # and the value is the key, retrive the key from the reverse dict
+            # then delete the value you wanted from the list with the key
+            rev = {val: key for key, val in FileStorage.__objects.items()}
+            if obj in rev:
+                key_to_delete = rev[obj]
+                del FileStorage.__objects[key_to_delete]
+            return FileStorage.__objects
 
     def save(self):
         """Saves storage dictionary to file"""
